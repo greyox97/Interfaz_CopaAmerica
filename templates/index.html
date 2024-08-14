@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copa América 2024</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="bg-primary text-white text-center py-3">
+        <!-- <h1>Copa América 2024</h1> -->
+    </header>
+    <main class="container my-4">
+        <section id="upload-section" class="text-center mb-4">
+            <h2>Sube tu archivo CSV</h2>
+            <div id="drop-area" class="p-4 border border-secondary rounded">
+                <p>Arrastra y suelta el archivo CSV aquí o haz clic para seleccionar el archivo.</p>
+                <input type="file" id="fileElem" accept=".csv" class="d-none" onchange="uploadFile(this.files)">
+            </div>
+        </section>
+
+        <section id="groups" class="row">
+            <!-- Grupos y partidos de fase de grupos se mostrarán aquí -->
+        </section>
+
+        <section id="playoffs" class="mt-4 d-none">
+            <h2>Playoffs</h2>
+            <div class="playoff-bracket d-flex justify-content-center">
+                <div class="round quarter-finals">
+                    <h4>Cuartos de Final</h4>
+                    <div class="match mb-4">
+                        <div id="quarter1" class="team"></div>
+                        <div id="quarter1-date" class="date"></div>
+                    </div>
+                    <div class="match mb-4">
+                        <div id="quarter2" class="team"></div>
+                        <div id="quarter2-date" class="date"></div>
+                    </div>
+                    <div class="match mb-4">
+                        <div id="quarter3" class="team"></div>
+                        <div id="quarter3-date" class="date"></div>
+                    </div>
+                    <div class="match mb-4">
+                        <div id="quarter4" class="team"></div>
+                        <div id="quarter4-date" class="date"></div>
+                    </div>
+                </div>
+                <div class="round semi-finals">
+                    <h4>Semifinales</h4>
+                    <div class="match mb-4">
+                        <div id="semi1" class="team"></div>
+                        <div id="semi1-date" class="date"></div>
+                    </div>
+                    <div class="match mb-4">
+                        <div id="semi2" class="team"></div>
+                        <div id="semi2-date" class="date"></div>
+                    </div>
+                </div>
+                <div class="round final">
+                    <h4>Final</h4>
+                    <div class="match mb-4">
+                        <div id="final1" class="team"></div>
+                        <div id="final1-date" class="date"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Función para manejar la subida de archivos
+        function uploadFile(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        updateUI(data);
+                        document.getElementById('playoffs').classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        // Drag and Drop
+        const dropArea = document.getElementById('drop-area');
+        const fileElem = document.getElementById('fileElem');
+
+        dropArea.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropArea.classList.add('bg-light');
+        });
+
+        dropArea.addEventListener('dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropArea.classList.remove('bg-light');
+        });
+
+        dropArea.addEventListener('drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropArea.classList.remove('bg-light');
+
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                uploadFile(files);
+            }
+        });
+
+        dropArea.addEventListener('click', () => {
+            fileElem.click();
+        });
+
+        // Función para actualizar la interfaz
+        function updateUI(data) {
+            const groupSection = document.getElementById('groups');
+            const playoffPositions = {
+                quarter1: document.getElementById('quarter1'),
+                quarter2: document.getElementById('quarter2'),
+                quarter3: document.getElementById('quarter3'),
+                quarter4: document.getElementById('quarter4'),
+                semi1: document.getElementById('semi1'),
+                semi2: document.getElementById('semi2'),
+                final: [document.getElementById('final1')],
+            };
+            const playoffDates = {
+                quarter1: document.getElementById('quarter1-date'),
+                quarter2: document.getElementById('quarter2-date'),
+                quarter3: document.getElementById('quarter3-date'),
+                quarter4: document.getElementById('quarter4-date'),
+                semi1: document.getElementById('semi1-date'),
+                semi2: document.getElementById('semi2-date'),
+                final: document.getElementById('final1-date'),
+            };
+
+            groupSection.innerHTML = '';  // Limpiar secciones previas
+
+            // Renderizar grupos y partidos de fase de grupos
+            data.groups.forEach((group, groupIndex) => {
+                let groupDiv = document.createElement('div');
+                groupDiv.classList.add('col-md-6', 'mb-4');
+                console.log(`Procesando grupo: ${group.groupName}`);
+
+                // Filtrar equipos únicos en el grupo
+                const uniqueTeams = {};
+                group.teams.forEach(team => {
+                    if (!uniqueTeams[team.TeamName]) {
+                        uniqueTeams[team.TeamName] = team;
+                    }
+                });
+
+                groupDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-header text-center bg-secondary text-white">
+                            Grupo ${group.groupName}
+                        </div>
+                        <div class="accordion" id="accordion${group.groupName}">
+                            ${Object.values(uniqueTeams).map((team, teamIndex) => {
+                                const uniqueId = `${group.groupName}-${teamIndex}`;
+                                console.log(`Equipo: ${team.TeamName}, Unique ID: ${uniqueId}`);
+                                return `
+                                    <div class="card">
+                                        <div class="card-header" id="heading${uniqueId}">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link custom-accordion-header" type="button" data-toggle="collapse" data-target="#collapse${uniqueId}" aria-expanded="true" aria-controls="collapse${uniqueId}">
+                                                    ${team.TeamName}
+                                                </button>
+                                            </h5>
+                                        </div>
+
+                                        <div id="collapse${uniqueId}" class="collapse" aria-labelledby="heading${uniqueId}" data-parent="#accordion${group.groupName}">
+                                            <div class="card-body">
+                                                <strong>Jugadores Titulares:</strong>
+                                                <p>${team.StarterPlayers}</p>
+                                                <strong>Jugadores Suplentes:</strong>
+                                                <p>${team.SubstitutePlayers}</p>
+                                                <strong>Director Técnico:</strong>
+                                                <p>${team.Coach}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Partidos</h5>
+                            <ul class="list-group">
+                                ${group.matches.map(match => `
+                                    <li class="list-group-item">
+                                        ${match.Team1} vs ${match.Team2}<br>
+                                        <small>${match.MatchDate} - ${match.MatchTime}</small><br>
+                                        <strong>Resultado:</strong> ${match.Score1} - ${match.Score2}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>`;
+                groupSection.appendChild(groupDiv);
+            });
+
+            // Configurar los equipos para los playoffs
+            data.playoffs.forEach(match => {
+                const position = match.PlayoffPlace;
+                if (position === 'final') {
+                    playoffPositions[position][0].textContent = `${match.Team1} vs ${match.Team2}`;
+                    playoffDates[position].textContent = `${match.MatchDate} - ${match.MatchTime}`;
+                } else {
+                    playoffPositions[position].textContent = `${match.Team1} vs ${match.Team2}`;
+                    playoffDates[position].textContent = `${match.MatchDate} - ${match.MatchTime}`;
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

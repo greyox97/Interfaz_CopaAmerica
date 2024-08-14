@@ -1,0 +1,135 @@
+/* Estilos para el área de arrastrar y soltar */
+#drop-area {
+    transition: background-color 0.3s;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+#drop-area.bg-light {
+    background-color: #f1f1f1;
+}
+
+/* Estilos para las tarjetas de grupos */
+.card {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para las tarjetas */
+    border: 1px solid #ccc; /* Añade un borde sólido alrededor de la tarjeta */
+    overflow: hidden; /* Asegura que el contenido no sobresalga de las esquinas redondeadas */
+}
+
+.card-header {
+    font-weight: bold;
+    background-color: #f8f9fa; /* Color de fondo del encabezado */
+    border-bottom: 1px solid #ccc; /* Borde entre el encabezado y el contenido */
+    border-top-left-radius: 10px; /* Ajusta el radio de las esquinas superiores para que coincida con .card */
+    border-top-right-radius: 10px; /* Ajusta el radio de las esquinas superiores para que coincida con .card */
+    padding: 10px; /* Espaciado interno del encabezado */
+}
+
+
+/* Custom Accordion Header */
+.custom-accordion-header {
+    color: #0056b3;
+    text-decoration: none;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.custom-accordion-header:hover {
+    color: #ffffff;
+    background-color: #0056b3;
+    text-decoration: none;
+}
+
+/* Estilos para el bracket de playoffs en forma triangular */
+.playoff-bracket {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    background-image: url("../static/fondo.jpg");
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+    background-position: center; /* Centra la imagen de fondo */
+    background-color: rgba(255, 255, 255, 0.7); /* Color negro con 50% de opacidad */
+    background-blend-mode: overlay;
+    padding: 3%;
+    overflow: hidden; /* Asegura que el contenido no se desborde fuera de las esquinas redondeadas */
+    border-radius: 20px;
+}
+
+.round {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.match {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.team {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    min-width: 150px;
+}
+
+.date {
+    font-size: 0.9rem;
+    color: #313131;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    background-image: url("../static/copa3.jpg");
+    background-color: rgba(255, 255, 255, 0.103); /* Color negro con 50% de opacidad */
+    background-blend-mode: overlay;
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+    background-position: center; /* Centra la imagen de fondo */
+}
+
+header {
+    background-image: url("../static/CopaAmerica.jpg");
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+    background-position: center; /* Centra la imagen de fondo */
+    color: white; /* Color del texto */
+    padding: 20px 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px; /* Ajusta la altura según sea necesario */
+}
+
+h1, h2 {
+    margin: 0;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .playoff-bracket {
+        grid-template-columns: 1fr;
+    }
+}
